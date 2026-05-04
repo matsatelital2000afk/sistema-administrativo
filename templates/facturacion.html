@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<h1 style="color:#2c3e50; margin-bottom:20px;">🧾 Facturación</h1>
+
+<!-- Formulario -->
+<div class="seccion">
+  <h2>Nueva Factura</h2>
+  <form method="POST" action="/facturacion/nueva">
+    <div class="form-grupo">
+      <div>
+        <label>Producto</label>
+        <input type="text" name="producto" placeholder="Nombre del producto" required>
+      </div>
+      <div>
+        <label>Cantidad</label>
+        <input type="number" name="cantidad" placeholder="0" required>
+      </div>
+      <div>
+        <label>Precio unitario</label>
+        <input type="number" name="precio" placeholder="0" required>
+      </div>
+      <div>
+        <label>IVA %</label>
+        <select name="iva">
+          <option value="5">5%</option>
+          <option value="10" selected>10%</option>
+          <option value="15">15%</option>
+        </select>
+      </div>
+      <div>
+        <button type="submit" class="btn btn-verde">+ Registrar</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Tabla -->
+<div class="seccion">
+  <h2>Historial de Facturas</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Precio Unit.</th>
+        <th>Subtotal</th>
+        <th>IVA</th>
+        <th>Descuento</th>
+        <th>Total</th>
+        <th>Fecha</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in facturas %}
+      <tr>
+        <td>{{ f[0] }}</td>
+        <td>{{ f[1] }}</td>
+        <td>{{ f[2] }}</td>
+        <td>{{ "{:,.0f}".format(f[3]) }}</td>
+        <td>{{ "{:,.0f}".format(f[4]) }}</td>
+        <td>{{ "{:,.0f}".format(f[5]) }}</td>
+        <td>{{ "{:,.0f}".format(f[6]) }}</td>
+        <td><strong>{{ "{:,.0f}".format(f[7]) }}</strong></td>
+        <td>{{ f[8] }}</td>
+        <td>
+          <a href="/facturacion/eliminar/{{ f[0] }}"
+             class="btn btn-rojo"
+             onclick="return confirm('¿Eliminar esta factura?')">🗑</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

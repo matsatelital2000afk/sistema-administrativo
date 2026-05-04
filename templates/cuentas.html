@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<h1 style="color:#2c3e50; margin-bottom:20px;">💰 Cuentas por Cobrar</h1>
+
+<div class="seccion">
+  <h2>Nueva Cuenta</h2>
+  <form method="POST" action="/cuentas/nueva">
+    <div class="form-grupo">
+      <div>
+        <label>Cliente</label>
+        <input type="text" name="cliente" placeholder="Nombre del cliente" required>
+      </div>
+      <div>
+        <label>Concepto</label>
+        <input type="text" name="concepto" placeholder="Concepto" required>
+      </div>
+      <div>
+        <label>Monto</label>
+        <input type="number" name="monto" placeholder="0" required>
+      </div>
+      <div>
+        <label>Vencimiento</label>
+        <input type="date" name="vencimiento" required>
+      </div>
+      <div>
+        <button type="submit" class="btn btn-verde">+ Registrar</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="seccion">
+  <h2>Lista de Cuentas</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Cliente</th>
+        <th>Concepto</th>
+        <th>Monto</th>
+        <th>Emisión</th>
+        <th>Vencimiento</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in cuentas %}
+      <tr>
+        <td>{{ c[0] }}</td>
+        <td>{{ c[1] }}</td>
+        <td>{{ c[2] }}</td>
+        <td>{{ "{:,.0f}".format(c[3]) }}</td>
+        <td>{{ c[4] }}</td>
+        <td>{{ c[5] }}</td>
+        <td>
+          <span class="badge {% if c[6] == 'PAGADO' %}badge-verde{% else %}badge-rojo{% endif %}">
+            {{ c[6] }}
+          </span>
+        </td>
+        <td>
+          {% if c[6] == 'PENDIENTE' %}
+          <a href="/cuentas/pagar/{{ c[0] }}" class="btn btn-verde"
+             onclick="return confirm('¿Marcar como pagado?')">✔ Pagar</a>
+          {% endif %}
+          <a href="/cuentas/eliminar/{{ c[0] }}" class="btn btn-rojo"
+             onclick="return confirm('¿Eliminar?')">🗑</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

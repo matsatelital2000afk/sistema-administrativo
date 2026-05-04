@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<h1 style="color:#2c3e50; margin-bottom:20px;">Panel Principal</h1>
+
+<!-- Tarjetas resumen -->
+<div class="tarjetas">
+  <div class="tarjeta">
+    <h3>Total Facturas</h3>
+    <p>{{ total_facturas }}</p>
+  </div>
+  <div class="tarjeta azul">
+    <h3>Monto Facturado</h3>
+    <p>{{ "{:,.0f}".format(monto_total) }}</p>
+  </div>
+  <div class="tarjeta violeta">
+    <h3>Clientes</h3>
+    <p>{{ total_clientes }}</p>
+  </div>
+  <div class="tarjeta rojo">
+    <h3>Cuentas Pendientes</h3>
+    <p>{{ cuentas_pendientes }}</p>
+  </div>
+  <div class="tarjeta naranja">
+    <h3>Monto Pendiente</h3>
+    <p>{{ "{:,.0f}".format(monto_pendiente) }}</p>
+  </div>
+</div>
+
+<!-- Ultimas facturas -->
+<div class="seccion">
+  <h2>Últimas Facturas</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Producto</th>
+        <th>Cantidad</th>
+        <th>Total</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in ultimas_facturas %}
+      <tr>
+        <td>{{ f[0] }}</td>
+        <td>{{ f[1] }}</td>
+        <td>{{ f[2] }}</td>
+        <td>{{ "{:,.0f}".format(f[7]) }}</td>
+        <td>{{ f[8] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<h1 style="color:#2c3e50; margin-bottom:20px;">📦 Stock e Inventario</h1>
+
+<div class="seccion">
+  <h2>Nuevo Producto</h2>
+  <form method="POST" action="/stock/nuevo">
+    <div class="form-grupo">
+      <div>
+        <label>Nombre</label>
+        <input type="text" name="nombre" placeholder="Nombre del producto" required>
+      </div>
+      <div>
+        <label>Descripción</label>
+        <input type="text" name="descripcion" placeholder="Descripción">
+      </div>
+      <div>
+        <label>Precio compra</label>
+        <input type="number" name="precio_compra" placeholder="0" required>
+      </div>
+      <div>
+        <label>Precio venta</label>
+        <input type="number" name="precio_venta" placeholder="0" required>
+      </div>
+      <div>
+        <label>Stock inicial</label>
+        <input type="number" name="stock" placeholder="0" required>
+      </div>
+      <div>
+        <label>Stock mínimo</label>
+        <input type="number" name="stock_minimo" placeholder="0">
+      </div>
+      <div>
+        <button type="submit" class="btn btn-naranja">+ Registrar</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="seccion">
+  <h2>Productos en Stock</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>P. Compra</th>
+        <th>P. Venta</th>
+        <th>Stock</th>
+        <th>Stock Mín.</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in productos %}
+      <tr style="{% if p[5] <= p[6] %}background-color:#fde8e8;{% endif %}">
+        <td>{{ p[0] }}</td>
+        <td>{{ p[1] }}</td>
+        <td>{{ p[2] }}</td>
+        <td>{{ "{:,.0f}".format(p[3]) }}</td>
+        <td>{{ "{:,.0f}".format(p[4]) }}</td>
+        <td><strong>{{ p[5] }}</strong></td>
+        <td>{{ p[6] }}</td>
+        <td>{{ p[7] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

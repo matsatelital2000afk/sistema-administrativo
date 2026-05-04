@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<h1 style="color:#2c3e50; margin-bottom:20px;">👥 Clientes</h1>
+
+<div class="seccion">
+  <h2>Nuevo Cliente</h2>
+  <form method="POST" action="/clientes/nuevo">
+    <div class="form-grupo">
+      <div>
+        <label>Nombre</label>
+        <input type="text" name="nombre" placeholder="Nombre completo" required>
+      </div>
+      <div>
+        <label>RUC</label>
+        <input type="text" name="ruc" placeholder="RUC" required>
+      </div>
+      <div>
+        <label>Teléfono</label>
+        <input type="text" name="telefono" placeholder="Teléfono">
+      </div>
+      <div>
+        <label>Email</label>
+        <input type="text" name="email" placeholder="Email">
+      </div>
+      <div>
+        <label>Dirección</label>
+        <input type="text" name="direccion" placeholder="Dirección">
+      </div>
+      <div>
+        <button type="submit" class="btn btn-azul">+ Registrar</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="seccion">
+  <h2>Lista de Clientes</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>RUC</th>
+        <th>Teléfono</th>
+        <th>Email</th>
+        <th>Dirección</th>
+        <th>Fecha</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in clientes %}
+      <tr>
+        <td>{{ c[0] }}</td>
+        <td>{{ c[1] }}</td>
+        <td>{{ c[2] }}</td>
+        <td>{{ c[3] }}</td>
+        <td>{{ c[4] }}</td>
+        <td>{{ c[5] }}</td>
+        <td>{{ c[6] }}</td>
+        <td>
+          <a href="/clientes/eliminar/{{ c[0] }}"
+             class="btn btn-rojo"
+             onclick="return confirm('¿Eliminar este cliente?')">🗑</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
