@@ -295,9 +295,6 @@ def eliminar_cuenta(id):
     con.close()
     return redirect(url_for("cuentas"))
 
-if __name__ == "__main__":
+if __name__ ==git push "__main__":
     crear_tablas()
     app.run(debug=True)
-    git add .
-git commit -m "agregar login"
-git push
