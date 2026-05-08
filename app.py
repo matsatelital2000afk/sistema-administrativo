@@ -2,43 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 from datetime import datetime
 from functools import wraps
+import hashlib
 
 app = Flask(__name__)
 app.secret_key = "clave_secreta_123"
-
-# ---- USUARIO Y CONTRASEÑA ----
-USUARIO = "admin"
-CONTRASENA = "admin123"
-
-# ---- DECORADOR LOGIN ----
-
-def login_requerido(f):
-    @wraps(f)
-    def decorador(*args, **kwargs):
-        if "usuario" not in session:
-            return redirect(url_for("login"))
-        return f(*args, **kwargs)
-    return decorador
-
-# ---- RUTAS DE LOGIN ----
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    error = None
-    if request.method == "POST":
-        usuario = request.form["usuario"]
-        contrasena = request.form["contrasena"]
-        if usuario == USUARIO and contrasena == CONTRASENA:
-            session["usuario"] = usuario
-            return redirect(url_for("index"))
-        else:
-            error = "Usuario o contraseña incorrectos"
-    return render_template("login.html", error=error)
-
-@app.route("/logout")
-def logout():
-    session.pop("usuario", None)
-    return redirect(url_for("login"))
 
 # ---- BASE DE DATOS ----
 
@@ -50,6 +17,16 @@ def get_db():
 def crear_tablas():
     con = get_db()
     cur = con.cursor()
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT,
+            email TEXT UNIQUE,
+            contrasena TEXT,
+            rol TEXT,
+            fecha TEXT
+        )
+    """)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS facturas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,10 +74,115 @@ def crear_tablas():
             estado TEXT
         )
     """)
+
+    # Crear admin por defecto si no existe
+    cur.execute("SELECT * FROM usuarios WHERE email = 'admin@sistema.com'")
+    if not cur.fetchone():
+        contrasena = hashlib.sha256("admin123".encode()).hexdigest()
+        cur.execute("""
+            INSERT INTO usuarios (nombre, email, contrasena, rol, fecha)
+            VALUES (?, ?, ?, ?, ?)
+        """, ("Administrador", "admin@sistema.com", contrasena, "admin", datetime.now().strftime("%d/%m/%Y")))
+
     con.commit()
     con.close()
 
-# ---- RUTAS ----
+# ---- HELPERS ----
+
+def encriptar(contrasena):
+    return hashlib.sha256(contrasena.encode()).hexdigest()
+
+def login_requerido(f):
+    @wraps(f)
+    def decorador(*args, **kwargs):
+        if "usuario" not in session:
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorador
+
+def admin_requerido(f):
+    @wraps(f)
+    def decorador(*args, **kwargs):
+        if "usuario" not in session:
+            return redirect(url_for("login"))
+        if session.get("rol") != "admin":
+            return redirect(url_for("index"))
+        return f(*args, **kwargs)
+    return decorador
+
+# ---- LOGIN ----
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    error = None
+    if request.method == "POST":
+        email = request.form["email"]
+        contrasena = encriptar(request.form["contrasena"])
+        con = get_db()
+        cur = con.cursor()
+        cur.execute("SELECT * FROM usuarios WHERE email = ? AND contrasena = ?", (email, contrasena))
+        usuario = cur.fetchone()
+        con.close()
+        if usuario:
+            session["usuario"] = usuario["nombre"]
+            session["email"] = usuario["email"]
+            session["rol"] = usuario["rol"]
+            session["usuario_id"] = usuario["id"]
+            return redirect(url_for("index"))
+        else:
+            error = "Email o contraseña incorrectos"
+    return render_template("login.html", error=error)
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
+
+# ---- USUARIOS (solo admin) ----
+
+@app.route("/usuarios")
+@admin_requerido
+def usuarios():
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT * FROM usuarios ORDER BY id DESC")
+    usuarios = cur.fetchall()
+    con.close()
+    return render_template("usuarios.html", usuarios=usuarios)
+
+@app.route("/usuarios/nuevo", methods=["POST"])
+@admin_requerido
+def nuevo_usuario():
+    nombre = request.form["nombre"]
+    email = request.form["email"]
+    contrasena = encriptar(request.form["contrasena"])
+    rol = request.form["rol"]
+    fecha = datetime.now().strftime("%d/%m/%Y")
+    con = get_db()
+    cur = con.cursor()
+    try:
+        cur.execute("""
+            INSERT INTO usuarios (nombre, email, contrasena, rol, fecha)
+            VALUES (?, ?, ?, ?, ?)
+        """, (nombre, email, contrasena, rol, fecha))
+        con.commit()
+    except sqlite3.IntegrityError:
+        pass
+    finally:
+        con.close()
+    return redirect(url_for("usuarios"))
+
+@app.route("/usuarios/eliminar/<int:id>")
+@admin_requerido
+def eliminar_usuario(id):
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("DELETE FROM usuarios WHERE id = ?", (id,))
+    con.commit()
+    con.close()
+    return redirect(url_for("usuarios"))
+
+# ---- RUTAS PRINCIPALES ----
 
 @app.route("/")
 @login_requerido
@@ -295,6 +377,6 @@ def eliminar_cuenta(id):
     con.close()
     return redirect(url_for("cuentas"))
 
-if __name__ ==git push "__main__":
+if __name__ == "__main__":
     crear_tablas()
     app.run(debug=True)

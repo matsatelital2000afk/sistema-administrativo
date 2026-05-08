@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<h1 style="color:#2c3e50; margin-bottom:20px;">👥 Gestión de Usuarios</h1>
+
+<div class="seccion">
+  <h2>Nuevo Usuario</h2>
+  <form method="POST" action="/usuarios/nuevo">
+    <div class="form-grupo">
+      <div>
+        <label>Nombre</label>
+        <input type="text" name="nombre" placeholder="Nombre completo" required>
+      </div>
+      <div>
+        <label>Email</label>
+        <input type="email" name="email" placeholder="email@ejemplo.com" required>
+      </div>
+      <div>
+        <label>Contraseña</label>
+        <input type="password" name="contrasena" placeholder="Contraseña" required>
+      </div>
+      <div>
+        <label>Rol</label>
+        <select name="rol">
+          <option value="usuario">Usuario</option>
+          <option value="admin">Administrador</option>
+        </select>
+      </div>
+      <div>
+        <button type="submit" class="btn btn-azul">+ Crear Usuario</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="seccion">
+  <h2>Lista de Usuarios</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Rol</th>
+        <th>Fecha</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in usuarios %}
+      <tr>
+        <td>{{ u[0] }}</td>
+        <td>{{ u[1] }}</td>
+        <td>{{ u[2] }}</td>
+        <td>
+          <span class="badge {% if u[4] == 'admin' %}badge-verde{% else %}badge-rojo{% endif %}">
+            {{ u[4] }}
+          </span>
+        </td>
+        <td>{{ u[5] }}</td>
+        <td>
+          {% if u[2] != 'admin@sistema.com' %}
+          <a href="/usuarios/eliminar/{{ u[0] }}"
+             class="btn btn-rojo"
+             onclick="return confirm('¿Eliminar usuario?')">🗑</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

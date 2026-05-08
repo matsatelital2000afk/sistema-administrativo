@@ -190,11 +190,14 @@
   <div class="sidebar">
     <h2>🏢 Sistema Admin</h2>
     <a href="/" class="{% if request.path == '/' %}activo{% endif %}">🏠 Panel Principal</a>
-    <a href="/facturacion" class="{% if request.path == '/facturacion' %}activo{% endif %}">🧾 Facturación</a>
-    <a href="/stock" class="{% if request.path == '/stock' %}activo{% endif %}">📦 Stock</a>
-    <a href="/clientes" class="{% if request.path == '/clientes' %}activo{% endif %}">👥 Clientes</a>
-    <a href="/cuentas" class="{% if request.path == '/cuentas' %}activo{% endif %}">💰 Cuentas</a>
-  <a href="/logout" style="color:#e74c3c;">🚪 Cerrar sesión</a>
+<a href="/facturacion" class="{% if request.path == '/facturacion' %}activo{% endif %}">🧾 Facturación</a>
+<a href="/stock" class="{% if request.path == '/stock' %}activo{% endif %}">📦 Stock</a>
+<a href="/clientes" class="{% if request.path == '/clientes' %}activo{% endif %}">👥 Clientes</a>
+<a href="/cuentas" class="{% if request.path == '/cuentas' %}activo{% endif %}">💰 Cuentas</a>
+{% if session.get('rol') == 'admin' %}
+<a href="/usuarios" class="{% if request.path == '/usuarios' %}activo{% endif %}">⚙️ Usuarios</a>
+{% endif %}
+<a href="/logout" style="color:#e74c3c; margin-top:20px;">🚪 Cerrar sesión</a>
 </div>
 
   <!-- Contenido -->
